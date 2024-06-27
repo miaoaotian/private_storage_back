@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.self_back.mapper.FileInfoMapper">
+    <resultMap id="FilesVOResultMap" type="filesVO">
+        <id column="id" property="id"/>
+        <id column="name" property="name"/>
+        <id column="cover" property="cover"/>
+        <id column="user_id" property="userId"/>
+        <id column="type" property="type"/>
+        <id column="size" property="size"/>
+        <id column="last_update_time" property="lastUpdateTime"/>
+        <id column="create_time" property="createTime"/>
+        <id column="path" property="path"/>
+    </resultMap>
+    <insert id="addFile" parameterType="fileInfo">
+        INSERT INTO fileinfo (name, cover, pid, type, size, create_time, last_update_time, user_id, category, md5,path)
+        VALUES (#{name}, #{cover}, #{pid}, #{type}, #{size}, #{createTime}, #{lastUpdateTime}, #{userId}, #{category}, #{md5},#{path})
+    </insert>
+    <select id="getFileInfoByFileIdAndCategory" resultMap="FilesVOResultMap">
+        select id,name,cover,user_id,type,size,last_update_time,create_time,path from fileinfo
+        where user_id = #{userId}  and del = 0
+        <if test="id != null">
+            and pid = #{id}
+        </if>
+        <if test="category != null">
+            and category = #{category}
+        </if>
+    </select>
+    <select id="getPath" resultType="map">
+        WITH RECURSIVE path_cte AS (
+            SELECT id, pid, name
+            FROM fileinfo
+            WHERE id = #{id}
+            UNION ALL
+            SELECT t.id, t.pid, t.name
+            FROM fileinfo t
+                     INNER JOIN path_cte cte ON t.id = cte.pid
+        )
+        SELECT id, pid, name
+        FROM path_cte
+    </select>
+
+    <update id="markAsDeleted">
+        UPDATE fileinfo SET del = 1 WHERE id = #{id}
+    </update>
+
+    <select id="findChildrenById" resultType="java.lang.Integer">
+        SELECT id FROM fileinfo WHERE pid = #{id} AND del = 0
+    </select>
+    <update id="markAsDeleted2">
+        UPDATE fileinfo SET del = 2 WHERE id = #{id}
+    </update>
+
+    <select id="findChildrenById2" resultType="java.lang.Integer">
+        SELECT id FROM fileinfo WHERE pid = #{id} AND del = 1
+    </select>
+    <update id="markAsRefresh">
+        UPDATE fileinfo SET del = 0 WHERE id = #{id}
+    </update>
+
+    <select id="findChildrenById3" resultType="java.lang.Integer">
+        SELECT id FROM fileinfo WHERE pid = #{id} AND del = 1
+    </select>
+    <select id="getFileInRecycle" resultMap="FilesVOResultMap">
+        SELECT id, name, cover, user_id, type, size, last_update_time, create_time, path
+        FROM fileinfo
+        WHERE user_id = #{user_id} AND (
+                (pid = 0 AND del = 1) OR
+                (pid != 0 AND del = 1 AND EXISTS (
+                    SELECT 1 FROM fileinfo parent WHERE parent.id = fileinfo.pid AND parent.del = 0
+                ))
+            );
+    </select>
+    <select id="getAllFoldersById" resultMap="FilesVOResultMap">
+        select id,name,type from fileinfo where user_id = #{userId} and pid = #{fileId} and del=0 and type=0
+    </select>
+
+
+</mapper>

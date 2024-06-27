@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.self_back.mapper.FileShareMapper">
+    <resultMap id="ShareVOMap" type="ShareVO">
+        <result property="userId" column="user_id"/>
+        <result property="fileId" column="file_id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="cover" column="cover"/>
+        <result property="shareId" column="share_id"/>
+        <result property="createTime" column="create_time" javaType="java.util.Date"/>
+        <result property="expireTime" column="expire_time" javaType="java.util.Date"/>
+        <result property="shareLink" column="share_link"/>
+        <result property="validType" column="valid_type"/>
+        <result property="code" column="code"/>
+    </resultMap>
+
+    <select id="getAllShares" resultMap="ShareVOMap">
+        SELECT
+            i.id AS file_id,
+            i.user_id AS user_id,
+            i.name AS name,
+            i.type AS type,
+            i.cover AS cover,
+            s.id AS share_id,
+            s.create_time AS create_time,
+            s.expire_time AS expire_time,
+            s.share_link AS share_link,
+            s.valid_type AS valid_type,
+            s.code AS code
+        FROM
+            fileinfo i
+                INNER JOIN
+            fileshare s
+            ON
+                i.id = s.file_id
+        WHERE i.user_id = #{userId}
+    </select>
+
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.self_back.mapper.OutShareMapper">
+        <resultMap id="ShareMap" type="Share">
+            <result property="id" column="id"/>
+            <result property="fileId" column="file_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="code" column="code"/>
+            <result property="validType" column="valid_type"/>
+            <result property="shareLink" column="share_link"/>
+            <result property="createTime" column="create_time"/>
+            <result property="expireTime" column="expire_time"/>
+        </resultMap>
+
+        <select id="getShareByLink" parameterType="String" resultMap="ShareMap">
+            SELECT *
+            FROM fileshare
+            WHERE share_link = #{link}
+        </select>
+</mapper>
