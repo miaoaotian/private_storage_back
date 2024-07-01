@@ -45,4 +45,16 @@ public interface FileInfoMapper {
 
     @Select("SELECT pid FROM fileinfo WHERE id = #{id}")
     Integer getParentId(@Param("id") int id);
+
+    @Select("SELECT path FROM fileinfo GROUP BY path HAVING COUNT(*) = COUNT(CASE WHEN del = 2 THEN 1 END)")
+    List<String> findPathsToDelete();
+
+    @Delete("DELETE FROM fileinfo WHERE path = #{path}")
+    void deleteRecordsByPath(String path);
+
+    @Delete("DELETE FROM fileinfo WHERE path IS NULL AND del = 2")
+    void deleteRecordsWithoutPath();
+
+    @Update("UPDATE fileinfo SET del = 2 WHERE del = 1 AND DATEDIFF(NOW(), last_update_time) > 10")
+    void updateDeletedRecords();
 }
