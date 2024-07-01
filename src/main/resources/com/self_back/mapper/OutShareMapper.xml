@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.self_back.mapper.OutShareMapper">
+        <resultMap id="FilesVOResultMap" type="filesVO">
+            <id column="id" property="id"/>
+            <id column="name" property="name"/>
+            <id column="cover" property="cover"/>
+            <id column="user_id" property="userId"/>
+            <id column="type" property="type"/>
+            <id column="size" property="size"/>
+            <id column="last_update_time" property="lastUpdateTime"/>
+            <id column="create_time" property="createTime"/>
+            <id column="path" property="path"/>
+        </resultMap>
         <resultMap id="ShareMap" type="Share">
             <result property="id" column="id"/>
             <result property="fileId" column="file_id"/>
@@ -18,4 +29,8 @@
             FROM fileshare
             WHERE share_link = #{link}
         </select>
+    <select id="getFileInfoByShareId" resultMap="FilesVOResultMap">
+        select id,name,cover,user_id,type,size,last_update_time,create_time,path from fileinfo
+        where user_id = #{userId}  and del = 0 and id = #{fileId}
+    </select>
 </mapper>

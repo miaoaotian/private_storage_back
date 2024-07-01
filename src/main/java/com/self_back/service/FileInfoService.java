@@ -48,11 +48,12 @@ public class FileInfoService {
 
     }
 
-
+    //这个是传token的
     public List<FilesVO> getFileInfoByFileIdAndCategory(String token, Integer id, Integer category) {
         int userId = TokenUtil.parseToken(token);
         return fileInfoMapper.getFileInfoByFileIdAndCategory(userId, id, category);
     }
+    //这个是传userid的
     public List<FilesVO> getFileInfoByFileIdAndCategory2(Integer userId, Integer id, Integer category) {
         return fileInfoMapper.getFileInfoByFileIdAndCategory(userId, id, category);
     }

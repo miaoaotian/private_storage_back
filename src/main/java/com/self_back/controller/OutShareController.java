@@ -9,7 +9,6 @@ import com.self_back.service.OutShareService;
 import com.self_back.utils.Constant;
 import com.self_back.utils.Result;
 import com.self_back.utils.TokenUtil;
-import jdk.jpackage.internal.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -55,8 +54,12 @@ public class OutShareController {
         return Result.success(userId);
     }
     @GetMapping("/getFiles")
-    public Result<List<FilesVO>> getFiles(@RequestParam("userId") int userId,@RequestParam("fileId") int fileId) {
-        Integer category = null;
+    public Result<List<FilesVO>> getFiles(@RequestParam("userId") int userId, @RequestParam("fileId") int fileId) {
+        List<FilesVO> filesVOS = outShareService.getFileInfoByShareId(fileId, userId);
+        return Result.success(filesVOS);
+    }
+    @PostMapping("/getFileByIdAndCategory")
+    public Result<List<FilesVO>> getFileByIdAndCategory(@RequestParam("userId") Integer userId, @RequestParam(value = "fileId",required = false) Integer fileId, @RequestParam(value = "category",required = false) Integer category) {
         List<FilesVO> filesVOS = fileInfoService.getFileInfoByFileIdAndCategory2(userId, fileId, category);
         return Result.success(filesVOS);
     }
@@ -97,9 +100,9 @@ public class OutShareController {
                 .body(resource);
     }
     @PostMapping("/changeFolder")
-    public Result<?> changeFolder(@RequestHeader("Authorization") String token, @RequestParam("tarId") int tarId,@RequestParam("ids") int[] ids) {
+    public Result<?> changeFolder(@RequestHeader("Authorization") String token, @RequestParam("tarId") int tarId,@RequestParam("id") int id) {
         int userId = TokenUtil.parseToken(token);
-        outShareService.changeFolder(userId, tarId, ids);
+        outShareService.changeFolder(userId, tarId, id);
         return Result.success();
     }
 

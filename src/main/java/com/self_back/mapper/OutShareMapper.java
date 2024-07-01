@@ -2,6 +2,7 @@ package com.self_back.mapper;
 
 import com.self_back.entity.po.FileInfo;
 import com.self_back.entity.po.Share;
+import com.self_back.entity.vo.FilesVO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -15,8 +16,9 @@ public interface OutShareMapper {
     @Insert("INSERT INTO fileinfo (user_id, md5, size, name, pid, cover, path, create_time, last_update_time, type, category, del) " +
             "VALUES (#{userId}, #{md5}, #{size}, #{name}, #{pid}, #{cover}, #{path}, #{createTime}, #{lastUpdateTime}, #{type}, #{category}, #{del})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    int copyFile(FileInfo fileInfo);
+    void copyFile(FileInfo fileInfo);
 
     @Select("SELECT id FROM fileinfo WHERE pid = #{parentId}")
     List<Integer> getChildren(@Param("parentId") int parentId);
+    List<FilesVO> getFileInfoByShareId(@Param("fileId") int fileId,@Param("userId") int userId);
 }
