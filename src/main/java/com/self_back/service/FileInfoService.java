@@ -6,6 +6,7 @@ import com.self_back.entity.vo.FilesVO;
 import com.self_back.mapper.FileInfoMapper;
 import com.self_back.mapper.UserMapper;
 import com.self_back.utils.Constant;
+import com.self_back.utils.Result;
 import com.self_back.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -186,5 +187,11 @@ public class FileInfoService {
             parentId = fileInfoMapper.getParentId(parentId);
         }
         return false;
+    }
+
+
+    public List<FilesVO> search(String token, String name) {
+        int userId = TokenUtil.parseToken(token);
+        return fileInfoMapper.search(userId, name);
     }
 }

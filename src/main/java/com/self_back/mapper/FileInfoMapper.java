@@ -57,4 +57,6 @@ public interface FileInfoMapper {
 
     @Update("UPDATE fileinfo SET del = 2 WHERE del = 1 AND DATEDIFF(NOW(), last_update_time) > 10")
     void updateDeletedRecords();
+
+    List<FilesVO> search(@Param("userId") int userId,@Param("name") String name);
 }

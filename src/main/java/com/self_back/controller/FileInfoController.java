@@ -124,4 +124,11 @@ public class FileInfoController {
         fileInfoService.changeFolder(tarId, ids);
         return Result.success();
     }
+
+    @GetMapping("/search")
+    public Result<List<FilesVO>> search(@RequestHeader("Authorization") String token,@RequestParam("query") String name) {
+        log.info("search: " + name);
+        List<FilesVO> filesVOS = fileInfoService.search(token,name);
+        return Result.success(filesVOS);
+    }
 }

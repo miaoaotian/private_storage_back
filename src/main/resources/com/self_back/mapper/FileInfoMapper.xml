@@ -75,6 +75,9 @@
     <select id="getAllFoldersById" resultMap="FilesVOResultMap">
         select id,name,type from fileinfo where user_id = #{userId} and pid = #{fileId} and del=0 and type=0
     </select>
-
+    <select id="search" resultMap="FilesVOResultMap">
+        select id,name,cover,user_id,type,size,last_update_time,create_time,path from fileinfo
+        where user_id = #{userId}  and del = 0 and name like concat('%',#{name},'%') and user_id = #{userId}
+    </select>
 
 </mapper>

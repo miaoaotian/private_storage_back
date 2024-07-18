@@ -4,7 +4,7 @@ public class Constant {
     public static int ERROR = 400;
     public static String pass_end = "qxk";
     public static String SECRET_KEY = "miaoaotian";
-    public static long EXPIRE_TIME = 24 * 60 * 60 * 1000;
+    public static long EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000;
 
     public static String AVATAR_PATH = "E:\\selfPan_Upload\\avatars\\";
     public static String FILE_PATH = "E:\\selfPan_Upload\\uploads\\";
