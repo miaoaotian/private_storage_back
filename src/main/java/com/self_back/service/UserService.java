@@ -65,6 +65,7 @@ public class UserService {
         String nowCode = (String) redisTemplate.opsForValue().get(key);
         if (nowCode == null) {throw new CodeErrException("验证码已过期");}
         if (!user.getEmailVerification().equals(nowCode)) {throw new CodeErrException("验证码错误");}
+        log.info(username + " " + password + " " + email);
         userMapper.insertUser(username,password,email);
     }
     public void changepass(String token, ChangePassDTO changePassDTO) {

@@ -50,13 +50,8 @@ public class UserController {
         return Result.success();
     }
     @PostMapping("/register")
-    public Result<?> register(@RequestParam("email") String email,
-                              @RequestParam("password") String password,
-                              @RequestParam("username") String username) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setUsername(username);
+    public Result<?> register(@RequestBody User user) {
+        log.info("user:"+user.toString());
         userService.doRegister(user);
         return Result.success();
     }

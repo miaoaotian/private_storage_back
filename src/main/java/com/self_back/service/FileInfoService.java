@@ -6,7 +6,6 @@ import com.self_back.entity.vo.FilesVO;
 import com.self_back.mapper.FileInfoMapper;
 import com.self_back.mapper.UserMapper;
 import com.self_back.utils.Constant;
-import com.self_back.utils.Result;
 import com.self_back.utils.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -35,6 +34,7 @@ public class FileInfoService {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private UserMapper userMapper;
+
 
     public void addFolder(String token, String folderName, int pid) {
         int userId = TokenUtil.parseToken(token);

@@ -1,13 +1,14 @@
 package com.self_back.Handler;
-import com.self_back.Exception.BusinessException;
 import com.self_back.mapper.FileInfoMapper;
 import com.self_back.mapper.UserMapper;
 import com.self_back.utils.*;
-import jdk.internal.org.jline.terminal.Size;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,11 @@ public class RabbitMqHandler {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private MinioClient minioClient;
+    @Value(value = "${minio.bucket}")
+    private String bucket;
+    private int userId = 0;
     @RabbitListener(queues = "upload_file_queue")
     @Transactional
     public void uploadFile(Map<String,Object> msgMap) {
@@ -42,7 +48,7 @@ public class RabbitMqHandler {
         String identifier = (String) msgMap.get("identifier");
         String filename = (String) msgMap.get("filename");
         long totalSize = (long) msgMap.get("totalSize");
-        int userId = (int) msgMap.get("userId");
+        userId = (int) msgMap.get("userId");
         //目标文件路径
         File fileFinal = new File(Constant.FILE_PATH + userId + "/" + filename);
         File dis = new File(Constant.FILE_PATH + userId);
@@ -128,6 +134,32 @@ public class RabbitMqHandler {
                 partFile.delete();
             }
         }
+        taskExecutor.execute(() -> {
+            try {
+                uploadToMinio(filePath, userId + "/" + new File(filePath).getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * 上传到minio进行数据备份
+     * @param filePath
+     * @param objectName
+     */
+    private void uploadToMinio(String filePath, String objectName) {
+        try (InputStream inputStream = new FileInputStream(filePath)) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(objectName)
+                            .stream(inputStream, new File(filePath).length(), -1)
+                            .contentType("application/octet-stream")
+                            .build());
+        } catch (Exception e) {
+            throw new RuntimeException("上传文件到 MinIO 失败", e);
+        }
     }
 
     /**
@@ -151,15 +183,15 @@ public class RabbitMqHandler {
         }
         // 定义生成 HLS 的命令
         final String CMD_2M3U8_2TS = "ffmpeg -y -i %s -c:v copy -c:a aac -bsf:a aac_adtstoasc -hls_time 30 -hls_list_size 0 -hls_segment_filename %s_%%04d.ts %s";
-
         // 设置 M3U8 文件的路径
         String m3u8Path = tsFolder + "/index.m3u8";
         // TS 文件名模式
         String tsSegmentPattern = tsFolder.getPath() + "/" + md5;
 
-
         // 生成.m3u8 和.ts 片段
         String cmd = String.format(CMD_2M3U8_2TS, videoFilePath, tsSegmentPattern, m3u8Path);
         ProcessUtils.executeCommand(cmd, false);
     }
+
+
 }
