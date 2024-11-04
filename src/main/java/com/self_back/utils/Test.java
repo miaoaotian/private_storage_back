@@ -10,7 +10,7 @@ public class Test {
         this.webClient = WebClient.builder()
                 .baseUrl("https://api.aiproxy.io/v1/chat")
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader("Authorization", "Bearer sk-r2EGXckGUeYOu5tMAg4tQMTMZeqVvJutTKSELQt10hGj21ZI")  // 替换成实际的 API 密钥
+                .defaultHeader("Authorization", "Bearer **************************")  // 替换成实际的 API 密钥
                 .build();
     }
 
